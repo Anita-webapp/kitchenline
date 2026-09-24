@@ -87,3 +87,82 @@
         <div class="shift-card" id="crew-toddler">
             <div class="chore-item" style="cursor: default;"><div class="chore-text" style="padding-left: 4px;"><h4 style="color: var(--accent);">Holding Pattern Role Assigned</h4><p style="font-size: 14px; line-height: 1.4; margin-top: 6px;">No structural cleaning duties assigned. Primary objective: Play quietly independently or alongside brothers while active kitchen food prep operations are underway.</p></div></div>
         </div>
+                </div>
+    </div>
+    <div class="recipe-section">
+        <div class="section-title">🍳 Kitchen Line Meal Matrices</div>
+        <select class="recipe-select" id="recipe-selector" onchange="loadRecipe()">
+            <option value="sheetpan">Staggered Sheet Pan Meal</option>
+            <option value="slowcooker">One-Pot Slow Cooker Meal</option>
+            <option value="tacos">Build-Your-Own Taco Station</option>
+            <option value="charcuterie">Bistro Grilled Cheese & Soup Line</option>
+        </select>
+        <div class="matrix-display" id="matrix-display"></div>
+    </div>
+    <div class="footer-branding"><p>The Household Kitchen Line™ Engine</p><p style="color: var(--border); margin-top: 4px;">Designed for Mobile Execution</p></div>
+    <script>
+        const recipes = {
+            sheetpan: [
+                { tier: "Teenager", class: "tier-teen", text: "Heavy double protein serving, extra potato carbs, broiled for an additional 5 minutes with thick melted cheese layer." },
+                { tier: "Pre-Teen (8yo)", class: "tier-preteen", text: "Standard protein and potato layout, cut clean, standard cheese topping melted evenly." },
+                { tier: "Toddler / Infant", class: "tier-toddler", text: "Protein and soft roasted veggies pulled 10 minutes early so they remain soft, easily chewable, and non-seared." }
+            ],
+            slowcooker: [
+                { tier: "Teenager", class: "tier-teen", text: "Massive double scoop over heavy rice base, topped with extra shredded cheese and sour cream for high density calories." },
+                { tier: "Pre-Teen (8yo)", class: "tier-preteen", text: "Standard protein and vegetable portion shredded fine over a light starch or grain bed." },
+                { tier: "Toddler / Infant", class: "tier-toddler", text: "Ultra-shredded soft root vegetables and soft protein mash mixed clean (liquid base drained to limit mess)." }
+            ],
+            tacos: [
+                { tier: "Teenager", class: "tier-teen", text: "3-4 heavily stacked full burritos/tacos packed tight with rice, beans, meat, and cheese for maximum fuel." },
+                { tier: "Pre-Teen (8yo)", class: "tier-preteen", text: "2 standard tacos assembled side-by-side with standard fixings." },
+                { tier: "Toddler / Infant", class: "tier-toddler", text: "Deconstructed taco board layout. Hand ingredients separated neatly on a sectioned plate so items do not touch." }
+            ],
+            charcuterie: [
+                { tier: "Teenager", class: "tier-teen", text: "Two full grilled cheese sandwiches made with thick bread, cut diagonally, served alongside a massive bowl of tomato soup for dipping." },
+                { tier: "Pre-Teen (8yo)", class: "tier-preteen", text: "One grilled cheese cut into 4 long 'dipping strips' (soldiers) served with a shallow mug of tomato soup that has cooled down." },
+                { tier: "Toddler / Infant", class: "tier-toddler", text: "A slice of lightly toasted bread with a melted slice of cheese, cut into tiny bite-sized cubes. Serve with a few spoonfuls of room-temperature soup mixed with cream." }
+            ]
+        };
+        function loadRecipe() {
+            const selected = document.getElementById('recipe-selector').value;
+            const data = recipes[selected];
+            let html = '';
+            data.forEach(item => {
+                html += '<div class="matrix-tier"><div class="tier-header ' + item.class + '">👤 <span>' + item.tier + ' Execution Strategy</span></div><div class="tier-content">' + item.text + '</div></div>';
+            });
+            document.getElementById('matrix-display').innerHTML = html;
+        }
+        loadRecipe();
+        function switchCrew(crew) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.shift-card').forEach(card => card.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('crew-' + crew).classList.add('active');
+        }
+        function toggleChore(element) { element.classList.toggle('completed'); }
+        let timerSeconds = 900; let timerInterval = null;
+        function updateTimerDisplay() {
+            const mins = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+            const secs = (timerSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = mins + ':' + secs;
+        }
+        function toggleTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval); timerInterval = null;
+                document.getElementById('timer-start').innerText = "Resume Shift";
+            } else {
+                document.getElementById('timer-start').innerText = "Pause Shift";
+                timerInterval = setInterval(() => {
+                    if (timerSeconds > 0) { timerSeconds--; updateTimerDisplay(); }
+                    else { clearInterval(timerInterval); timerInterval = null; alert("Shift Over! Kitchen Line Reset Completed."); resetTimer(); }
+                }, 1000);
+            }
+        }
+        function resetTimer() {
+            clearInterval(timerInterval); timerInterval = null; timerSeconds = 900; updateTimerDisplay();
+            document.getElementById('timer-start').innerText = "Start Shift";
+        }
+    </script>
+</body>
+</html>
+
